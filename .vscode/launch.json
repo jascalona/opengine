@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Launch Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd", // 👈 Cambia "cmd" por el nombre de la carpeta donde esté tu main.go
+            "env": {},
+            "args": []
+        }
+    ]
+}
