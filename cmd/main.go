@@ -13,33 +13,37 @@ import (
 )
 
 func main() {
-	// Cargar variables de entorno
+	// Cargar variables de entorno desde el archivo .env
 	if err := godotenv.Load(); err != nil {
 		log.Println("Archivo .env no encontrado, usando variables de sistema.")
 	}
 
-	// Cargar configuracion e inicializar DB
+	// Cargar configuración unificada (Env + appsetting.json) e inicializar DB
 	cfg := config.LoadConfig()
 	dbConn := config.InitDB(cfg.DatabaseURL)
 	defer dbConn.Close()
 
 	// =========================================================================
-	// INJECCION DE DEPENDENCIAS NEGOCIO (REPO)
+	// INYECCION DE DEPENDENCIAS: CAPA DE PERSISTENCIA (REPO)
 	// =========================================================================
 	gw_credit_repo := repository.NewRepoInitCreditGW(dbConn)
 
 	// =========================================================================
-	// INJECCION DE DEPENDENCIAS AUDITORIA (SERV)
+	// INYECCION DE DEPENDENCIAS: CAPA DE LOGICA DE NEGOCIO (SERV)
 	// =========================================================================
-	gw_credit_serv := serv.NewServInitCreditGW(gw_credit_repo)
+	// Ahora le pasamos de forma segura el repositorio y el sub-bloque de configuración
+	gw_credit_serv := serv.NewServInitCreditGW(
+		gw_credit_repo,
+		cfg.ExternalServices.CreditValidation,
+	)
 
 	// =========================================================================
-	// INJECCION DE DEPENDENCIAS (MANEJADOR HTTP)
+	// INYECCION DE DEPENDENCIAS: CAPA DE ENTREGA (MANEJADOR HTTP)
 	// =========================================================================
 	gw_credit_handler := delivery.NewHandlerInitCreditGW(gw_credit_serv)
 
 	// =========================================================================
-	// INSTANCIACIÓN DE ENRUTADORES MODULARES
+	// INSTANCIACION DE ENRUTADORES MODULARES
 	// =========================================================================
 	gw_transaction := router.NewRouterGW(
 		gw_credit_handler,
@@ -50,17 +54,16 @@ func main() {
 	}
 
 	// =========================================================================
-	// INICIALIZACIÓN DE GIN Y RUTAS CENTRALES
+	// INICIALIZACION DE GIN Y RUTAS CENTRALES
 	// =========================================================================
 	r := gin.Default()
 
 	router.SetupRouter(r, gwRouter)
 
-	// ejecucion del srv
+	// Ejecución del servidor
 	port := ":8089"
-	log.Printf("Servidor corriendo en el puerto: %s", port)
+	log.Printf("Servidor corriendo exitosamente en el puerto: %s", port)
 	if err := r.Run(port); err != nil {
-		log.Println("Error al iniciar el servidor: ", err)
+		log.Fatalf("Error crítico al iniciar el servidor: %v", err)
 	}
-
 }

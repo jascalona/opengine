@@ -1,0 +1,9 @@
+{
+    "external_services": {
+      "credit_validation": {
+        "base_url": "https://pruebas.bancrecer.sypago.net",
+        "username": "sygateway_user",
+        "password": "sB5I2lRO5Jxh1ia47S7KvnyLR"
+      }
+    }
+  }

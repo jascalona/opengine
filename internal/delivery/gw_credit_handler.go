@@ -79,6 +79,7 @@ func (h *InitCreditGwHandler) InitCredit(c *gin.Context) {
 
 	err := h.Service.InitCredit(c.Request.Context(), &creditazo)
 	if err != nil {
+		log.Printf("[ERROR]: %v", &creditazo)
 		c.JSON(http.StatusInternalServerError, gin.H{"error interno": err.Error()})
 		return
 	}

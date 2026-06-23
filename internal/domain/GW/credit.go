@@ -26,7 +26,7 @@ type CreditTransaction struct {
 	IssuingUser             UserData      `json:"IssuingUser" db:"issuing_user"`
 	ReceivingAgent          string        `json:"ReceivingAgent" db:"receiving_agent"`
 	ReceivingUser           UserData      `json:"ReceivingUser" db:"receiving_user"`
-	Inseted_at              string        `json:"Inserted_at" db:"inserted_at"`
+	Inseted_at              string        `json:"Inserted_at,omitempty" db:"inserted_at"`
 }
 
 type AmountDetails struct {
