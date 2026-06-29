@@ -61,7 +61,7 @@ func main() {
 	router.SetupRouter(r, gwRouter)
 
 	// Ejecución del servidor
-	port := ":8089"
+	port := ":8082"
 	log.Printf("Servidor corriendo exitosamente en el puerto: %s", port)
 	if err := r.Run(port); err != nil {
 		log.Fatalf("Error crítico al iniciar el servidor: %v", err)

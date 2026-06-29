@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db_opengine:
+    image: postgres:17-alpine
+    container_name: db_opengine
+    networks:
+      - serv
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=opengine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - /home/destroy/Documents/app_psql/opengine/rollback/backup.sql:/docker-entrypoint-initdb.d/backup.sql:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d opengine"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s # Bajado un poco para acelerar el inicio si la BD ya existe
+
+  opengine:
+    build: ./
+    container_name: opengine
+    networks:
+      - serv
+    ports:
+      - "8082:8082"
+    depends_on:
+      db_opengine:
+        condition: service_healthy # Esto asegura que la API espere a que la BD responda peticiones
+    environment:
+      - DATABASE_URL=postgres://postgres:root@db_opengine:5432/opengine?sslmode=disable
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_srv
+    ports:
+      - "80:80"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - opengine
+    networks:
+      - serv
+
+networks:
+  serv:
+    driver: bridge
+
+volumes:
+  postgres_data:
