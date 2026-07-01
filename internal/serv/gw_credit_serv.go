@@ -81,11 +81,11 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	tx.UserUniqueId = "371D2E119F52"
 	tx.Product = "040"
 	tx.SubProduct = "220"
-	tx.ProductSypago = "DEBIT"
+	tx.ProductSypago = "CREDIT"
 	tx.SubProductSypago = "SYPAGO"
 	tx.ApprovalAgent = "OTHE"
-	tx.SyPagoCreationChannel = "WEB-APP"
-	tx.SyPagoAcceptanceChannel = "WEB-CHECKOUT"
+	tx.SyPagoCreationChannel = "TOOLS-QA"
+	tx.SyPagoAcceptanceChannel = "TOOLS-QA"
 
 	// =========================================================================================
 	// LOGICA: Request HTTP al servicio GW | clausula de persistencia en bd para casos fallidos
