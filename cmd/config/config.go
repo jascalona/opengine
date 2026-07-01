@@ -29,7 +29,7 @@ type AppSettings struct {
 func LoadConfig() Config {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:root@localhost:5432/opengine?sslmode=disable"
+		dbURL = "postgres://postgres:root@localhost:5433/opengine?sslmode=disable"
 	}
 
 	var extServices ExternalServicesConfig

@@ -48,7 +48,7 @@ func (s *ServInitCreditGWImpl) ListCredit(ctx context.Context) ([]*gw.CreditTran
 
 func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTransaction) error {
 
-	//------- Generador de transactionID
+	// ------- Generador de transactionID
 	transaction_Id := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	long := 12
@@ -62,7 +62,7 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	// injeccion del string generado para el transactionId
 	tx.TransactionId = transaction_id.String()
 
-	//------- Generador del TraceID
+	// ------- Generador del TraceID
 	trace_Id := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var trace_id strings.Builder
 
@@ -81,8 +81,8 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	tx.UserUniqueId = "371D2E119F52"
 	tx.Product = "040"
 	tx.SubProduct = "220"
-	tx.ProductSypago = "DEBIT"     // Cambiado a DEBIT como tu Postman exitoso
-	tx.SubProductSypago = "SYPAGO" // Cambiado a SYPAGO como tu Postman exitoso
+	tx.ProductSypago = "DEBIT"
+	tx.SubProductSypago = "SYPAGO"
 	tx.ApprovalAgent = "OTHE"
 	tx.SyPagoCreationChannel = "WEB-APP"
 	tx.SyPagoAcceptanceChannel = "WEB-CHECKOUT"
@@ -93,18 +93,37 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	// serializacion del objeto completo ya construido a json
 
 	endpoint := "/api/v1/transaction"
-	fullURL := fmt.Sprintf("%s%s", s.Cfg.BaseURL, endpoint)
 
-	bodyJSON, err := json.Marshal(tx)
+	InitURL := fmt.Sprintf("%s%s", s.Cfg.BaseURL, endpoint)
+
+	// CONFIGURAR LA RUTA PARA TRABAJAR EL GET_TRANSACTION Y CONOCER EL ESTADO DE LA OPERACION DESDE QUE INICIA PARA INYECTAR EL VALOR EN LA BD
+	getURL := fmt.Sprintf("%s%s?transaction_id=%s", s.Cfg.BaseURL, endpoint, tx.TransactionId)
+
+	// cuerpo del msj
+	bodyJSON, err := json.Marshal(struct {
+		*gw.CreditTransaction // Hereda todos los campos originales con sus valores
+
+		// Sobreescribimos estos 3 campos con omitempty para que no viajen en este JSON
+		Status       string `json:"status,omitempty"`
+		RejectedCode string `json:"rejected_code,omitempty"`
+		EndToEndId   string `json:"end_to_end,omitempty"`
+	}{
+		CreditTransaction: tx, // enviamos en objeto original
+	})
+
 	if err != nil {
 		log.Println(bodyJSON)
 		return fmt.Errorf("Error al serializar payload: %v", err)
 	}
 
-	// Creamos la peticion HTTP apuntando a la URL del config
-	request, err := http.NewRequestWithContext(ctx, "POST", fullURL, bytes.NewBuffer(bodyJSON))
+	// peticion (Iniciacion del credito)
+	request, err := http.NewRequestWithContext(ctx, "POST", InitURL, bytes.NewBuffer(bodyJSON))
 	if err != nil {
-		return fmt.Errorf("error al crear request http: %w", err)
+		return fmt.Errorf("Error al enviar el request http: %w", err)
+	}
+
+	if err != nil {
+		return fmt.Errorf("Error al enviar el request http: %w", err)
 	}
 
 	request.Header.Set("Content-Type", "application/json")
@@ -124,12 +143,53 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	// Evaluar estatus 201 OK
 	if resp.StatusCode != http.StatusCreated {
 		log.Printf("Validacion rechazada. Status recibido: %d (%s)", resp.StatusCode, resp.Status)
-		log.Println("REQUEST INVOCADO PARA SYGATEWAY", fullURL)
+		log.Println("REQUEST INVOCADO PARA SYGATEWAY", InitURL)
 		//log.Println(resp)
 		return fmt.Errorf("la validacion del servicio externo retorno estatus %d", resp.StatusCode)
 	}
 
+	// =========================================================================================
+	// STS (ESTADO DE LA OPERACION)
+	// =========================================================================================
+	sts, err := http.NewRequestWithContext(ctx, "GET", getURL, nil)
+	if err != nil {
+		return fmt.Errorf("Error al crear request GET: %w", err)
+	}
+	sts.Header.Set("Content-Type", "application/json")
+	if s.Cfg.Username != "" && s.Cfg.Password != "" {
+		sts.SetBasicAuth(s.Cfg.Username, s.Cfg.Password)
+	}
+
+	// consulta GET
+	respStatus, err := s.HTTPClient.Do(sts)
+	if err != nil {
+		log.Println("Error al consultar el estado de la operacion: ", err.Error())
+		return fmt.Errorf("no se pudo consultar el estado de la transaccion")
+	}
+	defer respStatus.Body.Close()
+
+	if respStatus.StatusCode != http.StatusOK {
+		log.Printf("Error al consultar estado. Status recibido: %d", respStatus.StatusCode)
+		return fmt.Errorf("el servicio de consulta retorno estatus %d", respStatus.StatusCode)
+	}
+
+	// DECODIFICADOR DEL STS
+	var statusData gw.ResponseStatusGW
+
+	// json.NewDecoder lee directamente el flujo de bytes de respStatus.Body y lo mapea al struct
+	err = json.NewDecoder(respStatus.Body).Decode(&statusData)
+	if err != nil {
+		log.Println("Error al decodificar el JSON del estado: ", err.Error())
+		return fmt.Errorf("error al procesar la respuesta del servicio de estado")
+	}
+
+	log.Println("STS generado con Exito")
+	log.Printf("Estado actual: %s, Tipo RJCT: %s EndToEndId: %s", statusData.Status, statusData.RejectedCode, statusData.BankLongReference)
+
 	nowStr := time.Now().Format("2006-01-02T15:04:05")
+	tx.Status = statusData.Status
+	tx.RejectedCode = statusData.RejectedCode
+	tx.EndToEndId = statusData.BankLongReference
 	tx.SypagoProcessDate = &nowStr
 
 	// =========================================================================================
@@ -139,7 +199,7 @@ func (s *ServInitCreditGWImpl) InitCredit(ctx context.Context, tx *gw.CreditTran
 	err = s.Repo.InitCredit(ctx, tx)
 	if err != nil {
 		log.Println("Error al procesar la solicitud: ", err.Error())
-		fmt.Println(tx)
+		fmt.Println("Persistencia en BD", tx)
 		return fmt.Errorf("No se pudo generar la transaccion: %v", err.Error())
 	}
 	return nil

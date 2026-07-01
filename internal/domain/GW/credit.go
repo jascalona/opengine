@@ -26,7 +26,30 @@ type CreditTransaction struct {
 	IssuingUser             UserData      `json:"IssuingUser" db:"issuing_user"`
 	ReceivingAgent          string        `json:"ReceivingAgent" db:"receiving_agent"`
 	ReceivingUser           UserData      `json:"ReceivingUser" db:"receiving_user"`
-	Inseted_at              string        `json:"Inserted_at,omitempty" db:"inserted_at"`
+	Status                  string        `json:"status" db:"status"`
+	RejectedCode            string        `json:"rejected_code" db:"rejected_code"`
+	EndToEndId              string        `json:"end_to_end" db:"end_to_end"`
+}
+
+// ESTRUCTURA DE RESPUESTA STS
+type AmountGW struct {
+	Ccy string `json:"Ccy"`
+	Amt string `json:"Amt"`
+}
+
+type ResponseStatusGW struct {
+	TransactionId         string   `json:"TransactionId"`
+	TraceId               string   `json:"TraceId"`
+	SyPagoTraceId         string   `json:"SyPagoTraceId"`
+	BankLongReference     string   `json:"BankLongReference"`
+	BankReference         string   `json:"BankReference"`
+	UserId                string   `json:"UserId"`
+	UserReferenceUniqueId string   `json:"UserReferenceUniqueId"`
+	UserReferenceId       string   `json:"UserReferenceId"`
+	UserGroupId           string   `json:"UserGroupId"`
+	Amount                AmountGW `json:"Amount"`
+	Status                string   `json:"Status"`
+	RejectedCode          string   `json:"RejectedCode"`
 }
 
 type AmountDetails struct {
@@ -82,6 +105,9 @@ type ValidateServiceCredit struct {
 	IssuingUser             UserData      `json:"IssuingUser" binding:"required"`
 	ReceivingAgent          string        `json:"ReceivingAgent" binding:"required,max=4,min=4"`
 	ReceivingUser           UserData      `json:"ReceivingUser" binding:"required"`
+	Status                  string        `json:"status" binding:"omitempty"`
+	RejectedCode            string        `json:"rejected_code" binding:"omitempty"`
+	EndToEndId              string        `json:"end_to_end_id" binding:"omitempty"`
 }
 
 type InterfaceServiceCredit interface {

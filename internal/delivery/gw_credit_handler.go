@@ -75,6 +75,9 @@ func (h *InitCreditGwHandler) InitCredit(c *gin.Context) {
 		IssuingUser:             reqCredit.IssuingUser,
 		ReceivingAgent:          reqCredit.ReceivingAgent,
 		ReceivingUser:           reqCredit.ReceivingUser,
+		Status:                  reqCredit.Status,
+		EndToEndId:              reqCredit.EndToEndId,
+		RejectedCode:            reqCredit.RejectedCode,
 	}
 
 	err := h.Service.InitCredit(c.Request.Context(), &creditazo)

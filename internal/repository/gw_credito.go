@@ -20,28 +20,31 @@ func NewRepoInitCreditGW(db *sql.DB) gw.InterfaceServiceCredit {
 func (r *RepoInitCreditGW) InitCredit(ctx context.Context, tx *gw.CreditTransaction) error {
 
 	query := `
-		INSERT INTO transactionsGW(
-			trace_id,
-			transaction_id,
-			user_id,
-			user_reference_id,
-			user_group_id,
-			user_unique_id,
-			creation_date,
-			sypago_init_date,
-			sypago_process_date,
-			product,
-			sub_product,
-			product_sypago,
-			sub_product_sypago,
-			approval_agent,
-			sypago_creation_channel,
-			sypago_acceptance_channel,
-			issuing_agent,
-			receiving_agent,
-			amount,
-			issuing_user, 
-			receiving_user)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`
+        INSERT INTO transactionsgw (
+            trace_id,
+            transaction_id,
+            user_id,
+            user_reference_id,
+            user_group_id,
+            user_unique_id,
+            creation_date,
+            sypago_init_date,
+            sypago_process_date,
+            product,
+            sub_product,
+            product_sypago,
+            sub_product_sypago,
+            approval_agent,
+            sypago_creation_channel,
+            sypago_acceptance_channel,
+            issuing_agent,
+            receiving_agent,
+            amount,
+            issuing_user, 
+            receiving_user,
+            status,
+            rejected_code,
+			end_to_end)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)`
 
 	amountJSON, err := json.Marshal(tx.Amount)
 	if err != nil {
@@ -78,6 +81,9 @@ func (r *RepoInitCreditGW) InitCredit(ctx context.Context, tx *gw.CreditTransact
 		amountJSON,
 		issuingUserJSON,
 		receivingUserJSON,
+		tx.Status,
+		tx.RejectedCode,
+		tx.EndToEndId,
 	)
 
 	if err != nil {
@@ -112,8 +118,7 @@ func (r *RepoInitCreditGW) ListCredit(ctx context.Context) ([]*gw.CreditTransact
 			receiving_agent,
 			amount,
 			issuing_user, 
-			receiving_user,
-			inserted_at
+			receiving_user
 		FROM transactionsGW`
 
 	rows, err := r.DB.QueryContext(ctx, query)
@@ -143,18 +148,18 @@ func (r *RepoInitCreditGW) ListCredit(ctx context.Context) ([]*gw.CreditTransact
 			&rowsT.SypagoProcessDate,
 			&rowsT.Product,
 			&rowsT.SubProduct,
-			&Amount,
 			&rowsT.ProductSypago,
 			&rowsT.SubProductSypago,
 			&rowsT.ApprovalAgent,
 			&rowsT.SyPagoCreationChannel,
 			&rowsT.SyPagoAcceptanceChannel,
 			&rowsT.IssuingAgent,
-			&IssuingUser,
 			&rowsT.ReceivingAgent,
+			&Amount,
+			&IssuingUser,
 			&ReceivingUser,
-			&rowsT.Inseted_at,
 		)
+
 		if err != nil {
 			return nil, err
 		}

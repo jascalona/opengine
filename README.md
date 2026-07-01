@@ -28,3 +28,5 @@
                              │               └──> NO: Cancela operación    ──> Retorna Error al Cliente
 
 ```
+
+# Flujo de trabajo
