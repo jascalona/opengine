@@ -34,7 +34,7 @@ func main() {
 
 	// COMPONENTS
 	services_repo := cpRepo.NewServicespRepo(dbConn)
-
+	resources_repo := cpRepo.NewResourcesRepo(dbConn)
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE LOGICA DE NEGOCIO (SERV)
 	// =========================================================================
@@ -46,6 +46,7 @@ func main() {
 
 	// SERVICIOS COMPONENTS
 	services_serv := cpServ.NewServicesServ(services_repo)
+	resources_serv := cpServ.NewResourcesServ(resources_repo)
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE ENTREGA (MANEJADOR HTTP)
 	// =========================================================================
@@ -53,7 +54,7 @@ func main() {
 
 	// HANDLER COMPONENTS
 	services_handler := cpDelivery.NewServicesHandler(services_serv)
-
+	resources_handler := cpDelivery.NewResourcesHandler(resources_serv)
 	// =========================================================================
 	// INSTANCIACION DE ENRUTADORES MODULARES
 	// =========================================================================
@@ -63,6 +64,7 @@ func main() {
 
 	components_services := router.NewRouterComponents(
 		services_handler,
+		resources_handler,
 	)
 
 	apiRouter := router.MainRouter{
