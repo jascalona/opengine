@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
---\restrict WgYIYyq16b7h7LczXXc755pwxoQpcL6kbma6Teq7Fy1e85Tv8Wr4Nt53hV79Ue4
+\restrict dOtfXbarOkWZs6EinMEv1yDMlM87CZyQmXVPWTpJdDZfsX7eavNue7bwN2gLi3b
 
 -- Dumped from database version 17.10
 -- Dumped by pg_dump version 17.10
@@ -50,6 +50,61 @@ ALTER TABLE public.account_certification OWNER TO postgres;
 
 ALTER TABLE public.account_certification ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public.account_certification_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: resources; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.resources (
+    id bigint NOT NULL,
+    services_id integer,
+    name character varying(225),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.resources OWNER TO postgres;
+
+--
+-- Name: resources_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.resources ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.resources_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: services; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.services (
+    id bigint NOT NULL,
+    name character varying(225),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.services OWNER TO postgres;
+
+--
+-- Name: services_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.services ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.services_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -109,27 +164,30 @@ ALTER TABLE public.transactions OWNER TO postgres;
 --
 
 CREATE TABLE public.transactionsgw (
-    trace_id character varying(50) NOT NULL,
-    transaction_id character varying(50) NOT NULL,
-    user_id character varying(50),
-    user_reference_id character varying(50),
-    user_group_id character varying(50),
-    user_unique_id character varying(50),
-    creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    sypago_init_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    sypago_process_date timestamp without time zone,
-    product character varying(10),
-    sub_product character varying(10),
-    product_sypago character varying(20),
-    sub_product_sypago character varying(20),
-    approval_agent character varying(10),
-    sypago_creation_channel character varying(30),
-    sypago_acceptance_channel character varying(30),
-    issuing_agent character varying(10),
-    receiving_agent character varying(10),
-    amount jsonb NOT NULL,
-    issuing_user jsonb NOT NULL,
-    receiving_user jsonb NOT NULL,
+    trace_id character varying(255),
+    transaction_id character varying(255),
+    user_id character varying(255),
+    user_reference_id character varying(255),
+    user_group_id character varying(255),
+    user_unique_id character varying(255),
+    creation_date character varying(255),
+    sypago_init_date character varying(255),
+    sypago_process_date character varying(255),
+    product character varying(255),
+    sub_product character varying(255),
+    product_sypago character varying(255),
+    sub_product_sypago character varying(255),
+    approval_agent character varying(255),
+    sypago_creation_channel character varying(255),
+    sypago_acceptance_channel character varying(255),
+    issuing_agent character varying(255),
+    receiving_agent character varying(255),
+    amount jsonb,
+    issuing_user jsonb,
+    receiving_user jsonb,
+    status character varying(100),
+    rejected_code text,
+    end_to_end character varying(30),
     inserted_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -149,6 +207,48 @@ COPY public.account_certification (id, account_origin, name, document_id, agent,
 
 
 --
+-- Data for Name: resources; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.resources (id, services_id, name, created_at) FROM stdin;
+1	1	Sycloud	2026-07-02 17:55:56.909736
+2	1	Gateway	2026-07-02 17:55:56.909736
+3	1	Plugin	2026-07-02 17:55:56.909736
+4	1	CTS	2026-07-02 17:55:56.909736
+5	1	Solicitud de estado (Se va pronto)	2026-07-02 17:55:56.909736
+6	2	Rest Api	2026-07-02 17:57:30.338274
+7	2	MS Credito Emisor	2026-07-02 17:57:30.338274
+8	2	MS Credito Emisor STS	2026-07-02 17:57:30.338274
+9	2	MS Credito Receptor	2026-07-02 17:57:30.338274
+10	2	MS Credito Receptor STS	2026-07-02 17:57:30.338274
+11	2	MS Debito Emisor	2026-07-02 17:57:30.338274
+12	2	MS Debito Emisor STS	2026-07-02 17:57:30.338274
+13	2	MS Debito Receptor	2026-07-02 17:57:30.338274
+14	2	MS Debito Receptor STS	2026-07-02 17:57:30.338274
+15	3	MS Intra Emisor	2026-07-02 17:58:44.244808
+16	3	MS Intra Emisor STS	2026-07-02 17:58:44.244808
+17	3	MS Intra Receptor STS	2026-07-02 17:58:44.244808
+18	3	MS Inter Emisor	2026-07-02 17:58:44.244808
+19	3	MS Inter Emisor STS	2026-07-02 17:58:44.244808
+20	3	MS Inter Receptor	2026-07-02 17:58:44.244808
+21	3	MS Inter Receptor STS	2026-07-02 17:58:44.244808
+\.
+
+
+--
+-- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.services (id, name, created_at) FROM stdin;
+1	Sypago	2026-07-02 17:54:14.676301
+2	Simf	2026-07-02 17:54:14.676301
+3	Sglpar	2026-07-02 17:54:14.676301
+4	Alias	2026-07-02 17:54:14.676301
+5	Middleware	2026-07-02 17:54:14.676301
+\.
+
+
+--
 -- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -160,11 +260,14 @@ COPY public.transactions (id, inittransactiondate, processtransactiondate, useri
 -- Data for Name: transactionsgw; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.transactionsgw (trace_id, transaction_id, user_id, user_reference_id, user_group_id, user_unique_id, creation_date, sypago_init_date, sypago_process_date, product, sub_product, product_sypago, sub_product_sypago, approval_agent, sypago_creation_channel, sypago_acceptance_channel, issuing_agent, receiving_agent, amount, issuing_user, receiving_user, inserted_at) FROM stdin;
-C9636C4704C6	82123901B3C2	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21 09:11:09	2025-03-21 09:11:09	2026-06-23 17:25:37	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	2026-06-23 21:25:37.710762
-32A377645AAB	6D2A20676A2D	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21 09:11:09	2025-03-21 09:11:09	2026-06-23 17:26:35	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	2026-06-23 21:26:35.467139
-21CB945817B5	A4CDCDDB6B7A	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21 09:11:09	2025-03-21 09:11:09	2026-06-24 09:11:50	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	2026-06-24 13:11:50.289902
-DDA71AA47A38	8C730B0CD953	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21 09:11:09	2025-03-21 09:11:09	2026-06-24 09:14:41	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	2026-06-24 13:14:41.352056
+COPY public.transactionsgw (trace_id, transaction_id, user_id, user_reference_id, user_group_id, user_unique_id, creation_date, sypago_init_date, sypago_process_date, product, sub_product, product_sypago, sub_product_sypago, approval_agent, sypago_creation_channel, sypago_acceptance_channel, issuing_agent, receiving_agent, amount, issuing_user, receiving_user, status, rejected_code, end_to_end, inserted_at) FROM stdin;
+5C8C38B0735B	72542B3CD041	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T08:43:58	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	ACCP		01682026070108435605350777	2026-07-01 12:43:58.762081
+CAA650C478A0	734D2D288A77	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T11:44:02	040	220	CREDIT	SYPAGO	OTHE	TOOLS-QA	TOOLS-QA	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	ACCP		01682026070111440005350778	2026-07-01 15:44:02.83308
+4583876A1B3C	283961BCC6C9	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T11:45:32	040	220	CREDIT	SYPAGO	OTHE	TOOLS-QA	TOOLS-QA	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	ACCP		01682026070111453105350779	2026-07-01 15:45:32.672248
+A8C32DC5DCBD	3C9A7537A8A4	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T18:09:20	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	\N	\N	\N	2026-07-01 18:09:20.828706
+42ADD0A50DC0	BA8C65D9B2BA	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T18:10:40	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	\N	\N	\N	2026-07-01 18:10:40.073136
+C59492C62D6C	6C0A72B244D1	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-01T18:10:58	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	\N	\N	\N	2026-07-01 18:10:58.650551
+7CA7C7BA4449	72D9691D1628	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	2025-03-21T09:11:09	2025-03-21T09:11:09	2026-07-02T12:55:00	040	220	DEBIT	SYPAGO	OTHE	WEB-APP	WEB-CHECKOUT	0168	0168	{"Amt": 1, "Ccy": "VES", "Commission": 10.25}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680028785100594099", "Tp": "CNTA"}, "Document": {"Id": "J000003505", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	{"UserId": "0efe4730-9c2c-457d-a736-675a58c4e87c", "Account": {"Id": "01680001505100865475", "Tp": "CNTA"}, "Document": {"Id": "J002664436", "Nm": "Firma Personal", "SchmeNm": "SRIF"}, "LinkUserId": "0efe4730-9c2c-457d-a736-675a58c4e87c"}	\N	\N	\N	2026-07-02 12:55:00.312965
 \.
 
 
@@ -173,6 +276,20 @@ DDA71AA47A38	8C730B0CD953	371D2E119F49	A9C46BCAEF43	D3EE2EA3F757	371D2E119F52	20
 --
 
 SELECT pg_catalog.setval('public.account_certification_id_seq', 4, true);
+
+
+--
+-- Name: resources_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.resources_id_seq', 22, true);
+
+
+--
+-- Name: services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.services_id_seq', 5, true);
 
 
 --
@@ -200,6 +317,38 @@ ALTER TABLE ONLY public.account_certification
 
 
 --
+-- Name: resources resources_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT resources_name_key UNIQUE (name);
+
+
+--
+-- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT resources_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: services services_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.services
+    ADD CONSTRAINT services_name_key UNIQUE (name);
+
+
+--
+-- Name: services services_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.services
+    ADD CONSTRAINT services_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -208,24 +357,16 @@ ALTER TABLE ONLY public.transactions
 
 
 --
--- Name: transactionsgw transactionsgw_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: resources fk_services_resources; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.transactionsgw
-    ADD CONSTRAINT transactionsgw_pkey PRIMARY KEY (trace_id);
-
-
---
--- Name: transactionsgw transactionsgw_transaction_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.transactionsgw
-    ADD CONSTRAINT transactionsgw_transaction_id_key UNIQUE (transaction_id);
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT fk_services_resources FOREIGN KEY (services_id) REFERENCES public.services(id) ON UPDATE CASCADE;
 
 
 --
 -- PostgreSQL database dump complete
 --
 
---\unrestrict WgYIYyq16b7h7LczXXc755pwxoQpcL6kbma6Teq7Fy1e85Tv8Wr4Nt53hV79Ue4
+\unrestrict dOtfXbarOkWZs6EinMEv1yDMlM87CZyQmXVPWTpJdDZfsX7eavNue7bwN2gLi3b
 

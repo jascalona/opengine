@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"opengine.com/m/internal/delivery"
+	delivery "opengine.com/m/internal/delivery/services/gw"
 )
 
 type RouterGW struct {

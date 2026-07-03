@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"opengine.com/m/cmd/config"
-	gw "opengine.com/m/internal/domain/GW"
+	gw "opengine.com/m/internal/domain/services/gw"
 )
 
 type ServInitCreditGW interface {

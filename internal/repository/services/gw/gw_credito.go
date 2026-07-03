@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"log"
 
-	gw "opengine.com/m/internal/domain/GW"
+	gw "opengine.com/m/internal/domain/services/gw"
 )
 
 type RepoInitCreditGW struct {

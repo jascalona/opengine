@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"opengine.com/m/cmd/config"
-	"opengine.com/m/internal/delivery"
 	"opengine.com/m/internal/delivery/router"
-	"opengine.com/m/internal/repository"
-	"opengine.com/m/internal/serv"
+	delivery "opengine.com/m/internal/delivery/services/gw"
+	repository "opengine.com/m/internal/repository/services/gw"
+	serv "opengine.com/m/internal/serv/services/gw"
 )
 
 func main() {

@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	gw "opengine.com/m/internal/domain/GW"
+	gw "opengine.com/m/internal/domain/services/gw"
 	"opengine.com/m/internal/domain/utils"
-	"opengine.com/m/internal/serv"
+	serv "opengine.com/m/internal/serv/services/gw"
 )
 
 type InitCreditGwHandler struct {
