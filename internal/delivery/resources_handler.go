@@ -3,6 +3,7 @@ package delivery
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"opengine.com/m/internal/serv/components"
@@ -24,4 +25,22 @@ func (h *ResourcesHandler) GetResources(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, resources)
+}
+
+func (h *ResourcesHandler) ResourcesByServices(c *gin.Context) {
+	IdStr := c.Query("id")
+
+	resourcesId, err := strconv.Atoi(IdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error: ": "El ID deve ser un numero valido"})
+		return
+	}
+
+	list_resources, err := h.Service.ResourcesByServices(c.Request.Context(), resourcesId)
+	if err != nil {
+		log.Printf("Error al obtener los recursos asociados %d: %v", list_resources, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, list_resources)
 }

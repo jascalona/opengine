@@ -28,6 +28,8 @@ func (r *RouterComponents) RouterComponents(cp *gin.RouterGroup) {
 
 	resources := cp.Group("resources")
 	{
-		resources.GET("", r.components_rs.GetResources)
+		//resources.GET("", r.components_rs.GetResources)
+		resources.GET("", r.components_rs.ResourcesByServices)
 	}
+
 }

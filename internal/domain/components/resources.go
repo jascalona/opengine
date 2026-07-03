@@ -16,4 +16,5 @@ type ValidationResources struct {
 
 type InterfaceResources interface {
 	GetResources(ctx context.Context) ([]*Resources, error)
+	ResourcesByServices(ctx context.Context, id int) ([]*Resources, error)
 }
