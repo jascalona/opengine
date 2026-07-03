@@ -6,9 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"opengine.com/m/cmd/config"
+	cpDelivery "opengine.com/m/internal/delivery"
 	"opengine.com/m/internal/delivery/router"
 	delivery "opengine.com/m/internal/delivery/services/gw"
+
+	cpRepo "opengine.com/m/internal/repository/components"
 	repository "opengine.com/m/internal/repository/services/gw"
+	cpServ "opengine.com/m/internal/serv/components"
 	serv "opengine.com/m/internal/serv/services/gw"
 )
 
@@ -28,6 +32,9 @@ func main() {
 	// =========================================================================
 	gw_credit_repo := repository.NewRepoInitCreditGW(dbConn)
 
+	// COMPONENTS
+	services_repo := cpRepo.NewServicespRepo(dbConn)
+
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE LOGICA DE NEGOCIO (SERV)
 	// =========================================================================
@@ -37,10 +44,15 @@ func main() {
 		cfg.ExternalServices.CreditValidation,
 	)
 
+	// SERVICIOS COMPONENTS
+	services_serv := cpServ.NewServicesServ(services_repo)
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE ENTREGA (MANEJADOR HTTP)
 	// =========================================================================
 	gw_credit_handler := delivery.NewHandlerInitCreditGW(gw_credit_serv)
+
+	// HANDLER COMPONENTS
+	services_handler := cpDelivery.NewServicesHandler(services_serv)
 
 	// =========================================================================
 	// INSTANCIACION DE ENRUTADORES MODULARES
@@ -49,8 +61,13 @@ func main() {
 		gw_credit_handler,
 	)
 
-	gwRouter := router.MainRouter{
-		RouterGW: gw_transaction,
+	components_services := router.NewRouterComponents(
+		services_handler,
+	)
+
+	apiRouter := router.MainRouter{
+		RouterGW:         gw_transaction,
+		RouterComponents: components_services,
 	}
 
 	// =========================================================================
@@ -58,7 +75,7 @@ func main() {
 	// =========================================================================
 	r := gin.Default()
 
-	router.SetupRouter(r, gwRouter)
+	router.SetupRouter(r, apiRouter)
 
 	// Ejecución del servidor
 	port := ":8082"
