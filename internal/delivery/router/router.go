@@ -5,6 +5,7 @@ import "github.com/gin-gonic/gin"
 type MainRouter struct {
 	RouterGW         *RouterGW
 	RouterComponents *RouterComponents
+	//AccountCert      *RouterComponents
 }
 
 func SetupRouter(r *gin.Engine, routers MainRouter) {

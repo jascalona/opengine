@@ -8,15 +8,18 @@ import (
 type RouterComponents struct {
 	components_sv *delivery.ServicesHandler
 	components_rs *delivery.ResourcesHandler
+	account_c     *delivery.AccountCertHandler
 }
 
 func NewRouterComponents(
 	components *delivery.ServicesHandler,
 	components_rs *delivery.ResourcesHandler,
+	account_cert *delivery.AccountCertHandler,
 ) *RouterComponents {
 	return &RouterComponents{
 		components_sv: components,
 		components_rs: components_rs,
+		account_c:     account_cert,
 	}
 }
 
@@ -30,6 +33,11 @@ func (r *RouterComponents) RouterComponents(cp *gin.RouterGroup) {
 	{
 		//resources.GET("", r.components_rs.GetResources)
 		resources.GET("", r.components_rs.ResourcesByServices)
+	}
+
+	account_cert := cp.Group("account_cert")
+	{
+		account_cert.GET("", r.account_c.GetAccountCert)
 	}
 
 }
