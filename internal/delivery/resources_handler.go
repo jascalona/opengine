@@ -32,13 +32,14 @@ func (h *ResourcesHandler) ResourcesByServices(c *gin.Context) {
 
 	resourcesId, err := strconv.Atoi(IdStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error: ": "El ID deve ser un numero valido"})
+		c.JSON(http.StatusBadRequest, gin.H{"Error: ": "El ID debe ser un numero valido"})
 		return
 	}
 
 	list_resources, err := h.Service.ResourcesByServices(c.Request.Context(), resourcesId)
 	if err != nil {
 		log.Printf("Error al obtener los recursos asociados %d: %v", list_resources, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"Error interno: ": err.Error()})
 		return
 	}
 
