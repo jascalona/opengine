@@ -10,6 +10,7 @@ type RouterComponents struct {
 	components_rs   *delivery.ResourcesHandler
 	account_c       *delivery.AccountCertHandler
 	sub_resource_id *delivery.SubResourcesHandler
+	test_case_id    *delivery.TestCaseHandler
 }
 
 func NewRouterComponents(
@@ -17,12 +18,14 @@ func NewRouterComponents(
 	components_rs *delivery.ResourcesHandler,
 	account_cert *delivery.AccountCertHandler,
 	sub_resource *delivery.SubResourcesHandler,
+	test_case *delivery.TestCaseHandler,
 ) *RouterComponents {
 	return &RouterComponents{
 		components_sv:   components,
 		components_rs:   components_rs,
 		account_c:       account_cert,
 		sub_resource_id: sub_resource,
+		test_case_id:    test_case,
 	}
 }
 
@@ -48,4 +51,8 @@ func (r *RouterComponents) RouterComponents(cp *gin.RouterGroup) {
 		sub_resource.GET("", r.sub_resource_id.GetSubResources)
 	}
 
+	test_case := cp.Group("testcase")
+	{
+		test_case.GET("", r.test_case_id.TestCaseBySr)
+	}
 }

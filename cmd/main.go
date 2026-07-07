@@ -43,6 +43,8 @@ func main() {
 
 	account_cert_repo := AccountCertRepo.NewAccountCert(dbConn)
 
+	test_case_repo := cpRepo.NewTestCaseRepo(dbConn)
+
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE LOGICA DE NEGOCIO (SERV)
 	// =========================================================================
@@ -58,6 +60,9 @@ func main() {
 	sub_resource_serv := cpServ.NewSubRespurcesServ(sub_resource_repo)
 
 	account_cert_serv := AccountCertServ.NewAccountCertServ(account_cert_repo)
+
+	test_case_serv := cpServ.NewTestCaseServ(test_case_repo)
+
 	// =========================================================================
 	// INYECCION DE DEPENDENCIAS: CAPA DE ENTREGA (MANEJADOR HTTP)
 	// =========================================================================
@@ -69,6 +74,8 @@ func main() {
 	sub_resource_handler := cpDelivery.NewSubResourcesHandler(sub_resource_serv)
 
 	account_cert_handler := cpDelivery.NewAccountCert(account_cert_serv)
+
+	test_case_handler := cpDelivery.NewTestCaseHandler(test_case_serv)
 	// =========================================================================
 	// INSTANCIACION DE ENRUTADORES MODULARES
 	// =========================================================================
@@ -81,6 +88,7 @@ func main() {
 		resources_handler,
 		account_cert_handler,
 		sub_resource_handler,
+		test_case_handler,
 	)
 
 	apiRouter := router.MainRouter{

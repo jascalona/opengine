@@ -14,5 +14,5 @@ type TestCase struct {
 }
 
 type InterfaceTestCase interface {
-	GetTestCase(ctx context.Context) ([]*TestCase, error)
+	TestCaseBySr(ctx context.Context, sr_id int) ([]*TestCase, error)
 }
